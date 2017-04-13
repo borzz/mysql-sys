@@ -6,57 +6,57 @@
 
 ## Installation
 
-The objects should all be created as the root user (but run with the privileges of the invoker).
+Все объекты должны быть созданы как пользователь root (но выполняются с привилегиями вызывающего).
 
-For instance if you download to /tmp/mysql-sys/, and want to install the 5.6 version you should:
+Например, если вы загружаете в / tmp / mysql-sys /, и хотите установить версию 5.6, вы должны:
 
     cd /tmp/mysql-sys/
     mysql -u root -p < ./sys_56.sql
 
-Or if you would like to log in to the client, and install the 5.7 version:
+Или, если вы хотите войти в систему клиента, и установите версию 5.7:
 
     cd /tmp/mysql-sys/
     mysql -u root -p 
     SOURCE ./sys_57.sql
 
-Alternatively, you could just choose to load individual files based on your needs, but beware, certain objects have dependencies on other objects. You will need to ensure that these are also loaded.
+Кроме того, вы можете просто выбрать загрузку отдельных файлов в зависимости от ваших потребностей, но будьте осторожны, некоторые объекты имеют зависимости от других объектов. Вам нужно будет убедиться, что они тоже загружены.
 
 ### Generating a single SQL file
 
-There is bash script within the root of the branch directory, called `generate_sql_file.sh`, that allows you to create a single SQL file from the branch.
+В корне каталога филиалов есть сценарий bash, который называется `generate_sql_file.sh`, который позволяет вам создать из ветки один файл SQL.
 
-This includes substitution parameters for the MySQL user to use, and whether to include or exclude `SET sql_log_bin` commands from the scripts. This is particularly useful for installations such as Amazon RDS, which do not have the root@localhost user, or disallow setting sql_log_bin.
+Сюда входят параметры замены для пользователя MySQL, которые следует использовать, а также необходимость включения или исключения команд `SET sql_log_bin` из сценариев. Это особенно полезно для таких объектов, как Amazon RDS, которые не имеют root @ localhost, или запрещают установку sql_log_bin.
 
-When run, this outputs a file named such as `sys_<sys_version>_<mysql_version_identifier>_inline.sql`, i.e. `sys_1.2.0_56_inline.sql` is sys version 1.2.0, built for MySQL 5.6.
+При запуске это выводит файл с именем `sys_ <sys_version> _ <mysql_version_identifier> _inline.sql`, то есть` sys_1.2.0_56_inline.sql` - это sys version 1.2.0, созданный для MySQL 5.6.
 
-#### Options
+#### Опции
 
-* v: The version of MySQL to build the sys schema for, either '56' or '57'
-* b: Whether to omit any lines that deal with sql_log_bin (useful for RDS)
-* u: The user to set as the owner of the objects (useful for RDS)
-* m: Whether to generate a mysql_install_db / mysqld --initialize formatted file
+* v: Версия MySQL для построения схемы sys для '56' или '57'
+* b: Следует ли опускать любые строки, которые имеют дело с sql_log_bin (полезно для RDS)
+* u: Пользователь, который будет установлен владельцем объектов (полезно для RDS)
+* m: Создавать ли mysql_install_db / mysqld - инициализировать форматированный файл
 
-#### Examples
+#### Примеры
 
-Generate a MySQL 5.7 SQL file that uses the 'mark'@'localhost' user:
+Создайте SQL-файл MySQL 5.7, который использует пользователь 'mark' @ 'localhost:
 
     ./generate_sql_file.sh -v 57 -u "'mark'@'localhost'"
 
-Generate a MySQL 5.6 SQL file for RDS:
+Создайте SQL-файл MySQL 5.6 для RDS:
 
     ./generate_sql_file.sh -v 56 -b -u CURRENT_USER
 
-Generate a MySQL 5.7 bootstrap file:
+Создайте загрузочный файл MySQL 5.7:
 
     ./generate_sql_file.sh -v 57 -m
 
-## Overview of objects
+## Обзор объектов
 
-### Tables
+### таблиц
 
 #### sys_config
 
-##### Description
+##### Описание
 
 Holds configuration options for the sys schema. This is a persistent table (using the `InnoDB` storage engine), with the configuration persisting across upgrades (new options are added with `INSERT IGNORE`). 
 
